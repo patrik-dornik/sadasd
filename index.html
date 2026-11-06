@@ -4,542 +4,347 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ocean Cleaner | SDG 14</title>
-
+<title>Ocean Trash Catcher</title>
 <style>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#06223a;
+  color:white;
+  font-family:monospace;
+  text-align:center;
 }
-
-body {
-  background: #071d32;
-  color: white;
-  font-family: monospace;
-  text-align: center;
+h1{color:#70eaff;margin:20px 0 5px}
+.subtitle{color:#bdeeff;margin:8px}
+.game{
+  width:min(920px,96%);
+  margin:20px auto;
+  padding:15px;
+  background:#0c3b59;
+  border:4px solid #53d9ee;
+  border-radius:12px;
 }
-
-header {
-  padding: 35px 15px;
-  background: #063d5b;
-  border-bottom: 4px solid #48d9e8;
+.hud{
+  display:flex;
+  justify-content:center;
+  gap:25px;
+  flex-wrap:wrap;
+  padding:15px;
+  color:#ffe77b;
+  font-size:17px;
 }
-
-header h1 {
-  color: #65eaff;
-  font-size: clamp(28px, 5vw, 45px);
-  margin-bottom: 12px;
+canvas{
+  display:block;
+  width:100%;
+  height:auto;
+  background:#087da9;
+  border:3px solid white;
+  image-rendering:pixelated;
 }
-
-header p {
-  color: #d4f6ff;
-  font-size: 15px;
+button{
+  background:#ffe66d;
+  color:#092b43;
+  border:3px solid white;
+  padding:13px 22px;
+  margin:12px 5px;
+  font-family:monospace;
+  font-weight:bold;
+  cursor:pointer;
 }
-
-nav {
-  padding: 15px;
-  background: #092b45;
-}
-
-nav a {
-  color: #ffe778;
-  text-decoration: none;
-  margin: 0 12px;
-}
-
-section {
-  padding: 35px 15px;
-  max-width: 1000px;
-  margin: auto;
-}
-
-h2 {
-  color: #69eaff;
-  margin-bottom: 15px;
-}
-
-.intro {
-  line-height: 1.8;
-  max-width: 700px;
-  margin: auto;
-  color: #d6edf7;
-}
-
-#game-container {
-  background: #103c59;
-  padding: 20px;
-  border: 3px solid #48d9e8;
-  border-radius: 12px;
-  margin-top: 25px;
-}
-
-#game {
-  width: 100%;
-  max-width: 900px;
-  height: auto;
-  background: #087da9;
-  image-rendering: pixelated;
-  border: 3px solid white;
-  display: block;
-  margin: auto;
-  touch-action: none;
-}
-
-.hud {
-  display: flex;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 25px;
-  padding: 20px 5px;
-  color: #ffe778;
-  font-size: 17px;
-}
-
-button {
-  padding: 13px 22px;
-  margin: 8px;
-  background: #ffe66d;
-  color: #102e42;
-  border: 3px solid white;
-  font-family: monospace;
-  font-weight: bold;
-  cursor: pointer;
-}
-
-button:hover {
-  background: white;
-}
-
-.controls {
-  margin-top: 15px;
-  line-height: 2;
-  color: #d6edf7;
-}
-
-#message {
-  color: #ffe778;
-  margin-top: 15px;
-  min-height: 25px;
-}
-
-.mission {
-  background: #0b3450;
-  padding: 25px;
-  border-radius: 10px;
-  margin-top: 20px;
-  line-height: 1.8;
-}
-
-footer {
-  background: #05263c;
-  padding: 25px;
-  color: #a9dbe8;
-  margin-top: 30px;
-}
-
-@media(max-width:600px) {
-  nav a { display: inline-block; margin: 7px; }
-  .hud { gap: 12px; font-size: 14px; }
-}
+button:hover{background:white}
+#message{color:#ffe77b;min-height:22px}
+.controls{color:#c6eefa;line-height:1.8}
 </style>
 </head>
-
 <body>
 
-<header>
-  <h1>🌊 OCEAN CLEANER 🌊</h1>
-  <p>Protect Our Oceans • Save Marine Life • Stop Pollution</p>
-  <p>UN Sustainable Development Goal 14</p>
-</header>
+<h1>🌊 OCEAN TRASH CATCHER</h1>
+<p class="subtitle">SDG 14: LIFE BELOW WATER</p>
 
-<nav>
-  <a href="#about">ABOUT</a>
-  <a href="#game-section">PLAY GAME</a>
-  <a href="#mission">OUR MISSION</a>
-</nav>
+<div class="game">
 
-<section id="about">
-  <h2>🐢 Welcome to Ocean Cleaner!</h2>
-  <div class="intro">
-    <p>
-      Our oceans are full of life, but pollution threatens marine
-      ecosystems. Plastic bottles, cans and other waste can harm
-      sea creatures and damage underwater habitats.
-    </p>
-    <br>
-    <p>
-      In this minigame, you become an ocean cleaner!
-      Instead of fishing for fish, you collect rubbish
-      and help make the ocean a safer place.
-    </p>
-  </div>
-</section>
+<div class="hud">
+  <span>⭐ SCORE: <span id="score">0</span></span>
+  <span>🗑️ TRASH: <span id="trash">0</span></span>
+  <span>❤️ LIVES: <span id="lives">3</span></span>
+  <span>⏱️ TIME: <span id="time">60</span></span>
+</div>
 
-<section id="game-section">
-  <h2>🎮 PLAY THE MINIGAME</h2>
-  <p>Catch rubbish. Protect sea creatures. Save the ocean!</p>
+<canvas id="game" width="900" height="520"></canvas>
 
-  <div id="game-container">
+<button onclick="startGame()">START GAME</button>
+<button onclick="dropHook()">🎣 DROP HOOK</button>
 
-    <div class="hud">
-      <span>⭐ SCORE: <span id="score">0</span></span>
-      <span>🗑️ TRASH: <span id="trash">0</span></span>
-      <span>❤️ LIVES: <span id="lives">3</span></span>
-      <span>⏱️ TIME: <span id="time">60</span></span>
-    </div>
+<p id="message">Press START GAME to begin!</p>
 
-    <canvas id="game" width="900" height="520"></canvas>
+<div class="controls">
+  <p>⬅️ ➡️ Move your boat</p>
+  <p>SPACE = Drop fishing hook</p>
+  <p>Collect trash and avoid sea animals!</p>
+</div>
 
-    <button onclick="startGame()">START / RESTART</button>
-
-    <div class="controls">
-      <p>⬅️ ➡️ Move your boat</p>
-      <p>SPACE or DROP HOOK to fish for rubbish</p>
-      <button onclick="dropHook()">🎣 DROP HOOK</button>
-      <p id="message">Press START to begin cleaning the ocean!</p>
-    </div>
-  </div>
-</section>
-
-<section id="mission">
-  <h2>🌍 Our Mission – SDG 14</h2>
-
-  <div class="mission">
-    <h3>Life Below Water</h3>
-    <br>
-    <p>
-      Sustainable Development Goal 14 focuses on conserving
-      and sustainably using oceans, seas and marine resources.
-    </p>
-    <br>
-    <p>
-      Our game encourages people to understand the problem
-      of ocean pollution and reminds everyone that even
-      small actions can make a difference.
-    </p>
-    <br>
-    <h3>💙 Every piece of trash matters!</h3>
-  </div>
-</section>
-
-<footer>
-  <p>🌊 OCEAN CLEANER | SDG 14: LIFE BELOW WATER</p>
-  <p>Protect our oceans for future generations.</p>
-</footer>
+</div>
 
 <script>
-const canvas = document.getElementById("game");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("game");
+const ctx=canvas.getContext("2d");
 
-let score = 0;
-let trashCaught = 0;
-let lives = 3;
-let time = 60;
-let playing = false;
-let items = [];
-let particles = [];
-let timer;
-let animationId;
+let score=0,trash=0,lives=3,time=60;
+let playing=false,items=[],particles=[],timer;
 
-const player = { x: 450 };
+const player={x:450};
 
-let hook = {
-  x: 450,
-  y: 130,
-  active: false,
-  attached: null
-};
+let hook={x:450,y:130,active:false,attached:null};
 
-const objects = [
-  { emoji: "🧴", points: 10, type: "trash" },
-  { emoji: "🥫", points: 15, type: "trash" },
-  { emoji: "🛍️", points: 20, type: "trash" },
-  { emoji: "🛞", points: 25, type: "trash" },
-  { emoji: "🐠", points: 0, type: "fish" },
-  { emoji: "🐢", points: 0, type: "fish" }
+const objects=[
+  {emoji:"🧴",points:10,type:"trash"},
+  {emoji:"🥫",points:15,type:"trash"},
+  {emoji:"🛍️",points:20,type:"trash"},
+  {emoji:"🛞",points:25,type:"trash"},
+  {emoji:"🐠",points:0,type:"fish"},
+  {emoji:"🐢",points:0,type:"fish"}
 ];
 
-function spawn() {
-  const obj = objects[
-    Math.floor(Math.random() * objects.length)
-  ];
-
-  items.push({
-    x: 30 + Math.random() * 820,
-    y: 230 + Math.random() * 240,
-    emoji: obj.emoji,
-    points: obj.points,
-    type: obj.type,
-    speed: 0.5 + Math.random() * 1.3
-  });
+function spawn(){
+ const o=objects[Math.floor(Math.random()*objects.length)];
+ items.push({
+  x:30+Math.random()*820,
+  y:230+Math.random()*240,
+  emoji:o.emoji,
+  points:o.points,
+  type:o.type,
+  speed:0.5+Math.random()*1.3
+ });
 }
 
-function startGame() {
-  clearInterval(timer);
-
-  score = 0;
-  trashCaught = 0;
-  lives = 3;
-  time = 60;
-  items = [];
-  particles = [];
-
-  player.x = 450;
-  hook = {
-    x: 450,
-    y: 130,
-    active: false,
-    attached: null
-  };
-
-  playing = true;
-
-  for (let i = 0; i < 12; i++) spawn();
-
-  document.getElementById("message").textContent =
-    "Let's clean the ocean! 🌊";
-
-  updateHUD();
-
-  timer = setInterval(() => {
-    if (!playing) return;
-
-    time--;
-    updateHUD();
-
-    if (time <= 0) endGame();
-  }, 1000);
+function hud(){
+ document.getElementById("score").textContent=score;
+ document.getElementById("trash").textContent=trash;
+ document.getElementById("lives").textContent=lives;
+ document.getElementById("time").textContent=time;
 }
 
-function updateHUD() {
-  document.getElementById("score").textContent = score;
-  document.getElementById("trash").textContent = trashCaught;
-  document.getElementById("lives").textContent = lives;
-  document.getElementById("time").textContent = time;
+function startGame(){
+ clearInterval(timer);
+ score=0;trash=0;lives=3;time=60;
+ items=[];particles=[];
+ player.x=450;
+ hook={x:450,y:130,active:false,attached:null};
+ playing=true;
+
+ for(let i=0;i<12;i++)spawn();
+ hud();
+
+ document.getElementById("message").textContent="Clean the ocean! 🌊";
+
+ timer=setInterval(()=>{
+  if(!playing)return;
+  time--;
+  hud();
+  if(time<=0)endGame();
+ },1000);
 }
 
-function endGame() {
-  playing = false;
-  clearInterval(timer);
-
-  document.getElementById("message").textContent =
-    "🏆 Game over! You collected " + trashCaught +
-    " pieces of trash and scored " + score + " points!";
+function endGame(){
+ playing=false;
+ clearInterval(timer);
+ document.getElementById("message").textContent=
+ "🏆 GAME OVER! Score: "+score+" | Trash collected: "+trash;
 }
 
-function drawBackground() {
-  ctx.fillStyle = "#80dbee";
-  ctx.fillRect(0, 0, 900, 170);
+function background(){
+ // Sky
+ ctx.fillStyle="#80dbee";
+ ctx.fillRect(0,0,900,170);
 
-  // Sun
-  ctx.fillStyle = "#ffe36a";
-  ctx.fillRect(760, 25, 65, 65);
+ // Sun
+ ctx.fillStyle="#ffe36a";
+ ctx.fillRect(760,25,65,65);
 
-  // Ocean
-  ctx.fillStyle = "#087da9";
-  ctx.fillRect(0, 170, 900, 350);
+ // Clouds
+ ctx.fillStyle="white";
+ ctx.fillRect(100,40,65,15);
+ ctx.fillRect(115,25,35,20);
+ ctx.fillRect(300,70,80,15);
 
-  ctx.fillStyle = "#56d8ed";
-  ctx.fillRect(0, 170, 900, 8);
+ // Ocean
+ ctx.fillStyle="#087da9";
+ ctx.fillRect(0,170,900,350);
 
-  // Water details
-  ctx.fillStyle = "#1599bb";
-  for (let i = 0; i < 12; i++) {
-    ctx.fillRect((i * 97) % 900, 210 + i * 24, 50, 4);
-  }
+ ctx.fillStyle="#56d8ed";
+ ctx.fillRect(0,170,900,8);
 
-  // Sand
-  ctx.fillStyle = "#d6b36d";
-  ctx.fillRect(0, 485, 900, 35);
+ // Water details
+ ctx.fillStyle="#1599bb";
+ for(let i=0;i<12;i++){
+  ctx.fillRect((i*97)%900,210+i*24,50,4);
+ }
 
-  // Seaweed
-  for (let i = 0; i < 10; i++) {
-    let x = i * 100 + 20;
-    ctx.fillStyle = "#269c60";
-    ctx.fillRect(x, 450, 8, 35);
-    ctx.fillRect(x - 10, 465, 10, 8);
-    ctx.fillRect(x + 8, 445, 10, 8);
-  }
+ // Sand
+ ctx.fillStyle="#d6b36d";
+ ctx.fillRect(0,485,900,35);
+
+ // Seaweed
+ for(let i=0;i<10;i++){
+  let x=i*100+20;
+  ctx.fillStyle="#269c60";
+  ctx.fillRect(x,450,8,35);
+  ctx.fillRect(x-10,465,10,8);
+  ctx.fillRect(x+8,445,10,8);
+ }
 }
 
-function drawPlayer() {
-  // Boat
-  ctx.fillStyle = "#a74f32";
-  ctx.fillRect(player.x - 45, 70, 90, 30);
+function drawPlayer(){
+ // Boat
+ ctx.fillStyle="#a74f32";
+ ctx.fillRect(player.x-45,70,90,30);
 
-  // Boat cabin
-  ctx.fillStyle = "#f4f0d5";
-  ctx.fillRect(player.x - 30, 45, 60, 25);
+ // Cabin
+ ctx.fillStyle="#f4f0d5";
+ ctx.fillRect(player.x-30,45,60,25);
 
-  // Character
-  ctx.fillStyle = "#e8a477";
-  ctx.fillRect(player.x - 18, 35, 36, 35);
+ // Fisher
+ ctx.fillStyle="#e8a477";
+ ctx.fillRect(player.x-18,35,36,35);
 
-  ctx.fillStyle = "#633d29";
-  ctx.fillRect(player.x - 20, 30, 40, 12);
+ ctx.fillStyle="#633d29";
+ ctx.fillRect(player.x-20,30,40,12);
 
-  ctx.fillStyle = "#222";
-  ctx.fillRect(player.x - 13, 49, 5, 5);
-  ctx.fillRect(player.x + 7, 49, 5, 5);
+ ctx.fillStyle="#222";
+ ctx.fillRect(player.x-13,49,5,5);
+ ctx.fillRect(player.x+7,49,5,5);
 
-  ctx.fillStyle = "#3254a1";
-  ctx.fillRect(player.x - 15, 70, 30, 8);
+ ctx.fillStyle="#3254a1";
+ ctx.fillRect(player.x-15,70,30,8);
 }
 
-function drawHook() {
-  ctx.strokeStyle = "#5a3524";
-  ctx.lineWidth = 3;
+function drawHook(){
+ ctx.strokeStyle="#5a3524";
+ ctx.lineWidth=3;
+ ctx.beginPath();
+ ctx.moveTo(player.x,90);
+ ctx.lineTo(hook.x,hook.y);
+ ctx.stroke();
 
-  ctx.beginPath();
-  ctx.moveTo(player.x, 90);
-  ctx.lineTo(hook.x, hook.y);
-  ctx.stroke();
-
-  ctx.strokeStyle = "#dedede";
-  ctx.lineWidth = 4;
-
-  ctx.beginPath();
-  ctx.arc(hook.x, hook.y, 9, 0, Math.PI);
-  ctx.stroke();
+ ctx.strokeStyle="#ddd";
+ ctx.lineWidth=4;
+ ctx.beginPath();
+ ctx.arc(hook.x,hook.y,9,0,Math.PI);
+ ctx.stroke();
 }
 
-function drawItems() {
-  items.forEach(item => {
-    ctx.font = "30px Arial";
-    ctx.textAlign = "center";
-    ctx.fillText(item.emoji, item.x, item.y);
-  });
+function drawItems(){
+ items.forEach(i=>{
+  ctx.font="30px Arial";
+  ctx.textAlign="center";
+  ctx.fillText(i.emoji,i.x,i.y);
+ });
 }
 
-function drawParticles() {
-  particles.forEach(p => {
-    ctx.fillStyle = "#fff47a";
-    ctx.fillRect(p.x, p.y, 5, 5);
-    p.y -= 1;
-    p.life--;
-  });
-
-  particles = particles.filter(p => p.life > 0);
+function drawParticles(){
+ particles.forEach(p=>{
+  ctx.fillStyle="#fff47a";
+  ctx.fillRect(p.x,p.y,5,5);
+  p.y-=1;
+  p.life--;
+ });
+ particles=particles.filter(p=>p.life>0);
 }
 
-function moveItems() {
-  items.forEach(item => {
-    item.x += item.speed;
-
-    if (item.x > 880 || item.x < 20) {
-      item.speed *= -1;
-    }
-  });
+function dropHook(){
+ if(!playing||hook.active)return;
+ hook.x=player.x;
+ hook.y=130;
+ hook.active=true;
+ hook.attached=null;
 }
 
-function dropHook() {
-  if (!playing || hook.active) return;
+function update(){
+ items.forEach(i=>{
+  i.x+=i.speed;
+  if(i.x>880||i.x<20)i.speed*=-1;
+ });
 
-  hook.x = player.x;
-  hook.y = 130;
-  hook.active = true;
-  hook.attached = null;
-}
+ if(!hook.active)return;
 
-function updateHook() {
-  if (!hook.active) return;
+ if(hook.attached){
+  hook.y-=5;
 
-  if (hook.attached) {
-    hook.y -= 5;
+  if(hook.y<=130){
+   if(hook.attached.type==="trash"){
+    score+=hook.attached.points;
+    trash++;
 
-    if (hook.y <= 130) {
-      if (hook.attached.type === "trash") {
-        score += hook.attached.points;
-        trashCaught++;
-
-        for (let i = 0; i < 8; i++) {
-          particles.push({
-            x: hook.x,
-            y: hook.y,
-            life: 20
-          });
-        }
-
-        document.getElementById("message").textContent =
-          "Great job! You removed ocean pollution! 🗑️";
-
-        // Spawn a replacement
-        spawn();
-
-      } else {
-        lives--;
-        document.getElementById("message").textContent =
-          "Oops! You caught a sea creature. Protect marine life! 🐢";
-
-        if (lives <= 0) {
-          updateHUD();
-          endGame();
-        }
-      }
-
-      items = items.filter(i => i !== hook.attached);
-      hook.attached = null;
-      hook.active = false;
-      updateHUD();
+    for(let i=0;i<8;i++){
+     particles.push({
+      x:hook.x,y:hook.y,life:20
+     });
     }
 
-  } else {
-    hook.y += 5;
+    document.getElementById("message").textContent=
+    "Great job! You cleaned the ocean! 🗑️";
 
-    for (let item of items) {
-      if (
-        Math.abs(hook.x - item.x) < 25 &&
-        Math.abs(hook.y - item.y) < 25
-      ) {
-        hook.attached = item;
-        break;
-      }
-    }
+    spawn();
+   }else{
+    lives--;
+    document.getElementById("message").textContent=
+    "Oops! Protect the sea creatures! 🐢";
+   }
 
-    if (hook.y >= 475) {
-      hook.active = false;
-    }
+   items=items.filter(i=>i!==hook.attached);
+   hook.attached=null;
+   hook.active=false;
+   hud();
+
+   if(lives<=0)endGame();
   }
+
+ }else{
+  hook.y+=5;
+
+  for(let i of items){
+   if(Math.abs(hook.x-i.x)<25&&
+      Math.abs(hook.y-i.y)<25){
+    hook.attached=i;
+    break;
+   }
+  }
+
+  if(hook.y>=475)hook.active=false;
+ }
 }
 
-function draw() {
-  drawBackground();
-  drawPlayer();
-  drawHook();
-  drawItems();
-  drawParticles();
+function draw(){
+ background();
+ drawPlayer();
+ drawHook();
+ drawItems();
+ drawParticles();
 }
 
-function loop() {
-  if (playing) {
-    moveItems();
-    updateHook();
-    draw();
-  }
-
-  animationId = requestAnimationFrame(loop);
+function loop(){
+ if(playing){
+  update();
+  draw();
+ }
+ requestAnimationFrame(loop);
 }
 
-document.addEventListener("keydown", e => {
-  if (e.code === "ArrowLeft") {
-    player.x = Math.max(45, player.x - 25);
-  }
-
-  if (e.code === "ArrowRight") {
-    player.x = Math.min(855, player.x + 25);
-  }
-
-  if (e.code === "Space") {
-    e.preventDefault();
-    dropHook();
-  }
+document.addEventListener("keydown",e=>{
+ if(e.code==="ArrowLeft"){
+  player.x=Math.max(45,player.x-25);
+ }
+ if(e.code==="ArrowRight"){
+  player.x=Math.min(855,player.x+25);
+ }
+ if(e.code==="Space"){
+  e.preventDefault();
+  dropHook();
+ }
 });
 
-// Initial screen
 draw();
 loop();
 </script>
-
 </body>
 </html>
