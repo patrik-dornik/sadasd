@@ -4,347 +4,396 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ocean Trash Catcher</title>
+<title>Trash Valley 🎣</title>
 <style>
-*{box-sizing:border-box}
-body{
+* { box-sizing:border-box; }
+
+body {
   margin:0;
-  background:#06223a;
-  color:white;
+  background:#243d35;
+  color:#fff2cf;
   font-family:monospace;
   text-align:center;
-}
-h1{color:#70eaff;margin:20px 0 5px}
-.subtitle{color:#bdeeff;margin:8px}
-.game{
-  width:min(920px,96%);
-  margin:20px auto;
-  padding:15px;
-  background:#0c3b59;
-  border:4px solid #53d9ee;
-  border-radius:12px;
-}
-.hud{
-  display:flex;
-  justify-content:center;
-  gap:25px;
-  flex-wrap:wrap;
-  padding:15px;
-  color:#ffe77b;
-  font-size:17px;
-}
-canvas{
-  display:block;
-  width:100%;
-  height:auto;
-  background:#087da9;
-  border:3px solid white;
   image-rendering:pixelated;
 }
-button{
-  background:#ffe66d;
-  color:#092b43;
-  border:3px solid white;
+
+header {
+  background:#456b45;
+  padding:18px;
+  border-bottom:5px solid #273f2e;
+}
+
+h1 {
+  margin:0;
+  font-size:32px;
+  color:#ffe59b;
+  text-shadow:3px 3px #684b35;
+}
+
+.subtitle { color:#d9edb3; }
+
+.game {
+  max-width:750px;
+  margin:25px auto;
+  padding:15px;
+}
+
+.stats {
+  display:flex;
+  justify-content:space-around;
+  flex-wrap:wrap;
+  background:#72543c;
+  border:4px solid #b38b57;
+  padding:12px;
+  margin-bottom:15px;
+  gap:10px;
+}
+
+.pond {
+  height:300px;
+  position:relative;
+  overflow:hidden;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 35px,
+      #3c8e91 36px,
+      #3c8e91 39px
+    ),
+    #397d85;
+  border:8px solid #a67c4e;
+  box-shadow:inset 0 0 0 5px #254d50;
+}
+
+.water {
+  position:absolute;
+  font-size:35px;
+  animation:float 3s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-8px); }
+}
+
+#bobber {
+  position:absolute;
+  top:45%;
+  left:50%;
+  font-size:35px;
+  display:none;
+  transform:translate(-50%,-50%);
+}
+
+#message {
+  min-height:55px;
+  padding:15px;
+  font-size:16px;
+  color:#ffe59b;
+}
+
+button {
+  background:#d49b55;
+  color:#382b1d;
+  border:4px solid #805832;
   padding:13px 22px;
-  margin:12px 5px;
+  margin:7px;
   font-family:monospace;
   font-weight:bold;
+  font-size:16px;
   cursor:pointer;
+  box-shadow:0 4px #513820;
 }
-button:hover{background:white}
-#message{color:#ffe77b;min-height:22px}
-.controls{color:#c6eefa;line-height:1.8}
+
+button:hover {
+  background:#f2c878;
+  transform:translateY(-2px);
+}
+
+button:active {
+  transform:translateY(3px);
+  box-shadow:none;
+}
+
+button:disabled {
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.minigame {
+  display:none;
+  background:#72543c;
+  border:4px solid #b38b57;
+  padding:15px;
+  margin-top:15px;
+}
+
+.track {
+  background:#293b35;
+  height:32px;
+  position:relative;
+  border:3px solid #e6d09b;
+  margin:15px 0;
+}
+
+#target {
+  background:#83bc67;
+  position:absolute;
+  height:100%;
+  width:22%;
+  left:35%;
+}
+
+#marker {
+  background:#ffdb70;
+  width:5px;
+  height:100%;
+  position:absolute;
+  left:0;
+}
+
+.inventory {
+  background:#72543c;
+  border:4px solid #b38b57;
+  padding:15px;
+  margin-top:20px;
+}
+
+#collection {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+
+.item {
+  background:#4c6645;
+  padding:10px 4px;
+  border:2px solid #a68a59;
+  font-size:13px;
+}
+
+footer {
+  padding:25px;
+  color:#c7d6a1;
+}
 </style>
 </head>
 <body>
 
-<h1>🌊 OCEAN TRASH CATCHER</h1>
-<p class="subtitle">SDG 14: LIFE BELOW WATER</p>
+<header>
+  <h1>🗑️ TRASH VALLEY 🎣</h1>
+  <div class="subtitle">The worst fishing spot in the valley!</div>
+</header>
 
 <div class="game">
 
-<div class="hud">
-  <span>⭐ SCORE: <span id="score">0</span></span>
-  <span>🗑️ TRASH: <span id="trash">0</span></span>
-  <span>❤️ LIVES: <span id="lives">3</span></span>
-  <span>⏱️ TIME: <span id="time">60</span></span>
+  <div class="stats">
+    <div>💰 Coins: <span id="coins">0</span></div>
+    <div>🎣 Catches: <span id="catches">0</span></div>
+    <div>📅 Day: <span id="day">1</span></div>
+  </div>
+
+  <div class="pond">
+    <div class="water" style="top:20%;left:15%">〰️</div>
+    <div class="water" style="top:70%;left:75%">〰️</div>
+    <div class="water" style="top:35%;left:85%">🫧</div>
+    <div class="water" style="top:80%;left:25%">〰️</div>
+    <div id="bobber">🔴</div>
+  </div>
+
+  <div id="message">
+    The water smells suspicious...<br>
+    Maybe there's some good trash today?
+  </div>
+
+  <button id="castButton" onclick="cast()">🎣 CAST LINE</button>
+
+  <div class="minigame" id="minigame">
+    <h3>⚡ A BITE!! ⚡</h3>
+    <p>Press CATCH when the yellow marker is inside the green zone!</p>
+    <div class="track">
+      <div id="target"></div>
+      <div id="marker"></div>
+    </div>
+    <button onclick="catchItem()">CATCH!</button>
+  </div>
+
+  <div class="inventory">
+    <h3>📦 YOUR TRASH COLLECTION</h3>
+    <div id="collection">
+      <div class="item">Nothing yet...</div>
+    </div>
+  </div>
+
+  <button onclick="nextDay()">🌙 SLEEP UNTIL TOMORROW</button>
+
 </div>
 
-<canvas id="game" width="900" height="520"></canvas>
-
-<button onclick="startGame()">START GAME</button>
-<button onclick="dropHook()">🎣 DROP HOOK</button>
-
-<p id="message">Press START GAME to begin!</p>
-
-<div class="controls">
-  <p>⬅️ ➡️ Move your boat</p>
-  <p>SPACE = Drop fishing hook</p>
-  <p>Collect trash and avoid sea animals!</p>
-</div>
-
-</div>
+<footer>
+  Made with garbage and love 💚<br>
+  Trash Valley v1.0
+</footer>
 
 <script>
-const canvas=document.getElementById("game");
-const ctx=canvas.getContext("2d");
-
-let score=0,trash=0,lives=3,time=60;
-let playing=false,items=[],particles=[],timer;
-
-const player={x:450};
-
-let hook={x:450,y:130,active:false,attached:null};
-
-const objects=[
-  {emoji:"🧴",points:10,type:"trash"},
-  {emoji:"🥫",points:15,type:"trash"},
-  {emoji:"🛍️",points:20,type:"trash"},
-  {emoji:"🛞",points:25,type:"trash"},
-  {emoji:"🐠",points:0,type:"fish"},
-  {emoji:"🐢",points:0,type:"fish"}
+const trash = [
+  {name:"Old Boot",emoji:"👢",value:2,rarity:"Common"},
+  {name:"Soggy Newspaper",emoji:"📰",value:3,rarity:"Common"},
+  {name:"Broken CD",emoji:"💿",value:5,rarity:"Common"},
+  {name:"Tin Can",emoji:"🥫",value:2,rarity:"Common"},
+  {name:"Driftwood",emoji:"🪵",value:4,rarity:"Common"},
+  {name:"Plastic Bag",emoji:"🛍️",value:3,rarity:"Common"},
+  {name:"Old Tire",emoji:"🛞",value:10,rarity:"Uncommon"},
+  {name:"Rusty Key",emoji:"🗝️",value:25,rarity:"Rare"},
+  {name:"Golden Trash Can",emoji:"🗑️",value:100,rarity:"Legendary"},
+  {name:"Mysterious Doll",emoji:"🪆",value:50,rarity:"Rare"}
 ];
 
-function spawn(){
- const o=objects[Math.floor(Math.random()*objects.length)];
- items.push({
-  x:30+Math.random()*820,
-  y:230+Math.random()*240,
-  emoji:o.emoji,
-  points:o.points,
-  type:o.type,
-  speed:0.5+Math.random()*1.3
- });
-}
+let coins = 0;
+let catches = 0;
+let day = 1;
+let current = null;
+let playing = false;
+let markerPosition = 0;
+let direction = 1;
+let timer = null;
 
-function hud(){
- document.getElementById("score").textContent=score;
- document.getElementById("trash").textContent=trash;
- document.getElementById("lives").textContent=lives;
- document.getElementById("time").textContent=time;
-}
+let collection = {};
 
-function startGame(){
- clearInterval(timer);
- score=0;trash=0;lives=3;time=60;
- items=[];particles=[];
- player.x=450;
- hook={x:450,y:130,active:false,attached:null};
- playing=true;
+function update() {
+  document.getElementById("coins").textContent = coins;
+  document.getElementById("catches").textContent = catches;
+  document.getElementById("day").textContent = day;
 
- for(let i=0;i<12;i++)spawn();
- hud();
+  const area = document.getElementById("collection");
+  area.innerHTML = "";
 
- document.getElementById("message").textContent="Clean the ocean! 🌊";
-
- timer=setInterval(()=>{
-  if(!playing)return;
-  time--;
-  hud();
-  if(time<=0)endGame();
- },1000);
-}
-
-function endGame(){
- playing=false;
- clearInterval(timer);
- document.getElementById("message").textContent=
- "🏆 GAME OVER! Score: "+score+" | Trash collected: "+trash;
-}
-
-function background(){
- // Sky
- ctx.fillStyle="#80dbee";
- ctx.fillRect(0,0,900,170);
-
- // Sun
- ctx.fillStyle="#ffe36a";
- ctx.fillRect(760,25,65,65);
-
- // Clouds
- ctx.fillStyle="white";
- ctx.fillRect(100,40,65,15);
- ctx.fillRect(115,25,35,20);
- ctx.fillRect(300,70,80,15);
-
- // Ocean
- ctx.fillStyle="#087da9";
- ctx.fillRect(0,170,900,350);
-
- ctx.fillStyle="#56d8ed";
- ctx.fillRect(0,170,900,8);
-
- // Water details
- ctx.fillStyle="#1599bb";
- for(let i=0;i<12;i++){
-  ctx.fillRect((i*97)%900,210+i*24,50,4);
- }
-
- // Sand
- ctx.fillStyle="#d6b36d";
- ctx.fillRect(0,485,900,35);
-
- // Seaweed
- for(let i=0;i<10;i++){
-  let x=i*100+20;
-  ctx.fillStyle="#269c60";
-  ctx.fillRect(x,450,8,35);
-  ctx.fillRect(x-10,465,10,8);
-  ctx.fillRect(x+8,445,10,8);
- }
-}
-
-function drawPlayer(){
- // Boat
- ctx.fillStyle="#a74f32";
- ctx.fillRect(player.x-45,70,90,30);
-
- // Cabin
- ctx.fillStyle="#f4f0d5";
- ctx.fillRect(player.x-30,45,60,25);
-
- // Fisher
- ctx.fillStyle="#e8a477";
- ctx.fillRect(player.x-18,35,36,35);
-
- ctx.fillStyle="#633d29";
- ctx.fillRect(player.x-20,30,40,12);
-
- ctx.fillStyle="#222";
- ctx.fillRect(player.x-13,49,5,5);
- ctx.fillRect(player.x+7,49,5,5);
-
- ctx.fillStyle="#3254a1";
- ctx.fillRect(player.x-15,70,30,8);
-}
-
-function drawHook(){
- ctx.strokeStyle="#5a3524";
- ctx.lineWidth=3;
- ctx.beginPath();
- ctx.moveTo(player.x,90);
- ctx.lineTo(hook.x,hook.y);
- ctx.stroke();
-
- ctx.strokeStyle="#ddd";
- ctx.lineWidth=4;
- ctx.beginPath();
- ctx.arc(hook.x,hook.y,9,0,Math.PI);
- ctx.stroke();
-}
-
-function drawItems(){
- items.forEach(i=>{
-  ctx.font="30px Arial";
-  ctx.textAlign="center";
-  ctx.fillText(i.emoji,i.x,i.y);
- });
-}
-
-function drawParticles(){
- particles.forEach(p=>{
-  ctx.fillStyle="#fff47a";
-  ctx.fillRect(p.x,p.y,5,5);
-  p.y-=1;
-  p.life--;
- });
- particles=particles.filter(p=>p.life>0);
-}
-
-function dropHook(){
- if(!playing||hook.active)return;
- hook.x=player.x;
- hook.y=130;
- hook.active=true;
- hook.attached=null;
-}
-
-function update(){
- items.forEach(i=>{
-  i.x+=i.speed;
-  if(i.x>880||i.x<20)i.speed*=-1;
- });
-
- if(!hook.active)return;
-
- if(hook.attached){
-  hook.y-=5;
-
-  if(hook.y<=130){
-   if(hook.attached.type==="trash"){
-    score+=hook.attached.points;
-    trash++;
-
-    for(let i=0;i<8;i++){
-     particles.push({
-      x:hook.x,y:hook.y,life:20
-     });
-    }
-
-    document.getElementById("message").textContent=
-    "Great job! You cleaned the ocean! 🗑️";
-
-    spawn();
-   }else{
-    lives--;
-    document.getElementById("message").textContent=
-    "Oops! Protect the sea creatures! 🐢";
-   }
-
-   items=items.filter(i=>i!==hook.attached);
-   hook.attached=null;
-   hook.active=false;
-   hud();
-
-   if(lives<=0)endGame();
+  if(Object.keys(collection).length === 0) {
+    area.innerHTML = '<div class="item">Nothing yet...</div>';
+    return;
   }
 
- }else{
-  hook.y+=5;
+  for(let name in collection) {
+    const item = trash.find(t => t.name === name);
+    area.innerHTML += `
+      <div class="item">
+        <div style="font-size:28px">${item.emoji}</div>
+        ${item.name}<br>
+        x${collection[name]}
+      </div>`;
+  }
+}
 
-  for(let i of items){
-   if(Math.abs(hook.x-i.x)<25&&
-      Math.abs(hook.y-i.y)<25){
-    hook.attached=i;
-    break;
-   }
+function cast() {
+  if(playing) return;
+
+  playing = true;
+  document.getElementById("castButton").disabled = true;
+  document.getElementById("bobber").style.display = "block";
+  document.getElementById("message").textContent =
+    "You cast your line... waiting for garbage...";
+
+  setTimeout(() => {
+    if(!playing) return;
+
+    document.getElementById("message").textContent =
+      "!!! SOMETHING IS BITING !!!";
+
+    startMinigame();
+  }, 1500 + Math.random() * 2000);
+}
+
+function startMinigame() {
+  document.getElementById("minigame").style.display = "block";
+
+  let target = 20 + Math.random() * 60;
+  document.getElementById("target").style.left = target + "%";
+
+  markerPosition = 0;
+  direction = 1;
+
+  timer = setInterval(() => {
+    markerPosition += direction * 1.5;
+
+    if(markerPosition >= 98) direction = -1;
+    if(markerPosition <= 0) direction = 1;
+
+    document.getElementById("marker").style.left =
+      markerPosition + "%";
+  }, 20);
+}
+
+function catchItem() {
+  if(!playing || !timer) return;
+
+  clearInterval(timer);
+  timer = null;
+
+  const marker = markerPosition;
+  const target = document.getElementById("target");
+  const left = parseFloat(target.style.left);
+
+  if(marker >= left && marker <= left + 22) {
+    getTrash();
+  } else {
+    document.getElementById("message").textContent =
+      "💦 It slipped away! Even trash can escape...";
+    finish();
+  }
+}
+
+function getTrash() {
+  let roll = Math.random();
+  let item;
+
+  if(roll < 0.01) {
+    item = trash[8];
+  } else if(roll < 0.08) {
+    item = trash[7];
+  } else if(roll < 0.18) {
+    item = trash[9];
+  } else if(roll < 0.35) {
+    item = trash[6];
+  } else {
+    item = trash[Math.floor(Math.random() * 6)];
   }
 
-  if(hook.y>=475)hook.active=false;
- }
-}
+  current = item;
+  coins += item.value;
+  catches++;
 
-function draw(){
- background();
- drawPlayer();
- drawHook();
- drawItems();
- drawParticles();
-}
+  collection[item.name] = (collection[item.name] || 0) + 1;
 
-function loop(){
- if(playing){
+  document.getElementById("message").innerHTML =
+    `🎉 YOU CAUGHT: ${item.emoji} <b>${item.name}</b><br>
+     ${item.rarity} · +${item.value} coins!`;
+
   update();
-  draw();
- }
- requestAnimationFrame(loop);
+  finish();
 }
 
-document.addEventListener("keydown",e=>{
- if(e.code==="ArrowLeft"){
-  player.x=Math.max(45,player.x-25);
- }
- if(e.code==="ArrowRight"){
-  player.x=Math.min(855,player.x+25);
- }
- if(e.code==="Space"){
-  e.preventDefault();
-  dropHook();
- }
-});
+function finish() {
+  playing = false;
+  clearInterval(timer);
+  timer = null;
 
-draw();
-loop();
+  document.getElementById("minigame").style.display = "none";
+  document.getElementById("bobber").style.display = "none";
+  document.getElementById("castButton").disabled = false;
+}
+
+function nextDay() {
+  if(playing) return;
+
+  day++;
+  document.getElementById("message").textContent =
+    "🌅 Day " + day + "! The pond has even MORE garbage.";
+
+  update();
+}
+
+update();
 </script>
+
 </body>
 </html>
